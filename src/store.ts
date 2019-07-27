@@ -1,73 +1,70 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
 
-import { PriceEntity } from './type'
-
 Vue.use(Vuex)
 
-interface Price extends PriceEntity {
+interface Price {
+  isin: string
+  price: number
+  bid: number
+  ask: number
   timestamp: number
 }
 
 interface State {
-  stocks: ReadonlyArray<string>
-  prices: Readonly<{ [key: string]: Price }>
+  isConnectionOpen: boolean
+  stocks: string[]
+  prices: {
+    [key: string]: Price
+  }
 }
 
 export enum Actions {
-  addStock = 'addStock',
-  removeStock = 'removeStock',
-  setPrice = 'setPrice',
-}
-
-type SetPricePayloadType = {
-  price: PriceEntity
-  timestamp: number
+  ADD_STOCK = 'ADD_STOCK',
+  REMOVE_STOCK = 'REMOVE_STOCK',
 }
 
 export const store = new Vuex.Store<State>({
   state: {
+    isConnectionOpen: false,
     stocks: [],
     prices: {},
   },
   mutations: {
-    [Actions.addStock](state, newStock: string) {
-      state = {
-        ...state,
-        stocks: [...state.stocks, newStock],
+    [Actions.ADD_STOCK](state, newStock: string) {
+      if (!state.stocks.includes(newStock)) {
+        state.stocks = [...state.stocks, newStock]
       }
     },
-    [Actions.removeStock](state, stockToRemove: string) {
-      state = {
-        ...state,
-        stocks: state.stocks.filter(stock => stock !== stockToRemove),
-      }
+    [Actions.REMOVE_STOCK](state, stockToRemove: string) {
+      state.stocks = state.stocks.filter(stock => stock !== stockToRemove)
     },
-    [Actions.setPrice](state, payload: SetPricePayloadType) {
-      state = {
-        ...state,
-        prices: {
-          ...state.prices,
-          [payload.price.isin]: {
-            ...payload.price,
-            timestamp: payload.timestamp,
-          },
+    SOCKET_ONOPEN(state, event) {
+      Vue.prototype.$socket = event.currentTarget
+
+      state.isConnectionOpen = true
+    },
+    SOCKET_ONMESSAGE(state, message) {
+      state.prices = {
+        ...state.prices,
+        [message.isin]: {
+          ...message,
+          timestamp: Date.now(),
         },
       }
     },
+    SOCKET_ONCLOSE() {
+      Vue.prototype.$socket = undefined
+    },
   },
   actions: {
-    [Actions.addStock]({ commit }, stock: string) {
-      commit(Actions.addStock, stock)
+    [Actions.ADD_STOCK]({ commit }, stock: string) {
+      commit(Actions.ADD_STOCK, stock)
+      Vue.prototype.$socket.send(JSON.stringify({ subscribe: stock }))
     },
-    [Actions.removeStock]({ commit }, stock: string) {
-      commit(Actions.removeStock, stock)
-    },
-    [Actions.setPrice]({ commit }, price: PriceEntity) {
-      commit(Actions.setPrice, {
-        price,
-        timestamp: Date.now(),
-      })
+    [Actions.REMOVE_STOCK]({ commit }, stock: string) {
+      commit(Actions.REMOVE_STOCK, stock)
+      Vue.prototype.$socket.send(JSON.stringify({ unsubscribe: stock }))
     },
   },
 })
