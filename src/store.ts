@@ -14,6 +14,12 @@ interface State {
   prices: Readonly<{ [key: string]: Price }>
 }
 
+export enum Actions {
+  addStock = 'addStock',
+  removeStock = 'removeStock',
+  setPrice = 'setPrice',
+}
+
 type SetPricePayloadType = {
   price: PriceEntity
   timestamp: number
@@ -25,19 +31,19 @@ export const store = new Vuex.Store<State>({
     prices: {},
   },
   mutations: {
-    addStock(state, newStock: string) {
+    [Actions.addStock](state, newStock: string) {
       state = {
         ...state,
         stocks: [...state.stocks, newStock],
       }
     },
-    removeStock(state, stockToRemove: string) {
+    [Actions.removeStock](state, stockToRemove: string) {
       state = {
         ...state,
         stocks: state.stocks.filter(stock => stock !== stockToRemove),
       }
     },
-    setPrice(state, payload: SetPricePayloadType) {
+    [Actions.setPrice](state, payload: SetPricePayloadType) {
       state = {
         ...state,
         prices: {
@@ -51,14 +57,14 @@ export const store = new Vuex.Store<State>({
     },
   },
   actions: {
-    addStock({ commit }, stock: string) {
-      commit('addStock', stock)
+    [Actions.addStock]({ commit }, stock: string) {
+      commit(Actions.addStock, stock)
     },
-    removeStock({ commit }, stock: string) {
-      commit('removeStock', stock)
+    [Actions.removeStock]({ commit }, stock: string) {
+      commit(Actions.removeStock, stock)
     },
-    setPrice({ commit }, price: PriceEntity) {
-      commit('setPrice', {
+    [Actions.setPrice]({ commit }, price: PriceEntity) {
+      commit(Actions.setPrice, {
         price,
         timestamp: Date.now(),
       })
