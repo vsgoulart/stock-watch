@@ -3,7 +3,7 @@ import Vuex from 'vuex'
 
 Vue.use(Vuex)
 
-interface Price {
+export interface Stock {
   isin: string
   price: number
   bid: number
@@ -12,10 +12,13 @@ interface Price {
 }
 
 interface State {
-  isConnectionOpen: boolean
+  socket: {
+    isConnectionOpen: boolean
+    hasReconnectFailed: boolean
+  }
   stocks: string[]
   prices: {
-    [key: string]: Price
+    [key: string]: Stock
   }
 }
 
@@ -26,7 +29,10 @@ export enum Actions {
 
 export const store = new Vuex.Store<State>({
   state: {
-    isConnectionOpen: false,
+    socket: {
+      isConnectionOpen: false,
+      hasReconnectFailed: false,
+    },
     stocks: [],
     prices: {},
   },
@@ -42,7 +48,10 @@ export const store = new Vuex.Store<State>({
     SOCKET_ONOPEN(state, event) {
       Vue.prototype.$socket = event.currentTarget
 
-      state.isConnectionOpen = true
+      state.socket = {
+        isConnectionOpen: true,
+        hasReconnectFailed: false,
+      }
     },
     SOCKET_ONMESSAGE(state, message) {
       state.prices = {
@@ -53,8 +62,13 @@ export const store = new Vuex.Store<State>({
         },
       }
     },
-    SOCKET_ONCLOSE() {
+    SOCKET_ONCLOSE(state) {
       Vue.prototype.$socket = undefined
+
+      state.socket.isConnectionOpen = false
+    },
+    SOCKET_RECONNECT_ERROR(state) {
+      state.socket.hasReconnectFailed = true
     },
   },
   actions: {
