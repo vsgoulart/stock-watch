@@ -1,29 +1,43 @@
 <template>
   <div id="app">
-    <img alt="Vue logo" src="./assets/logo.png" />
-    <HelloWorld msg="Welcome to Your Vue.js + TypeScript App" />
+    <Form />
+    <h3 v-if="hasReconnectFailed">The connection has failed</h3>
+    <StockList />
+    <Stock v-for="stock in stocks" :key="stock" v-bind:isin="stock" />
   </div>
 </template>
 
 <script lang="ts">
 import Vue from 'vue'
-import HelloWorld from './components/HelloWorld.vue'
+
+import { Actions } from './store'
+
+import Form from './components/Form.vue'
+import StockList from './components/StockList.vue'
+import Stock from './components/Stock.vue'
 
 export default Vue.extend({
   name: 'app',
+  computed: {
+    stocks(): string[] {
+      return this.$store.state.stocks
+    },
+    hasReconnectFailed(): boolean {
+      return this.$store.state.socket.hasReconnectFailed
+    },
+  },
   components: {
-    HelloWorld,
+    Form,
+    StockList,
+    Stock,
   },
 })
 </script>
 
-<style lang="scss">
+<style lang="scss" scoped>
 #app {
-  font-family: 'Avenir', Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+  font-family: Arial, Helvetica, sans-serif;
   text-align: center;
-  color: #2c3e50;
-  margin-top: 60px;
+  color: #3e3e3e;
 }
 </style>
