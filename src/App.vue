@@ -1,7 +1,9 @@
 <template>
   <div id="app">
     <Form />
-    <h3 v-if="hasReconnectFailed">The connection has failed</h3>
+    <span class="md-display-2" v-if="hasReconnectFailed"
+      >The connection has failed</span
+    >
     <StockList />
     <div class="stock-container">
       <Stock v-for="stock in stocks" :key="stock" v-bind:isin="stock" />
