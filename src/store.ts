@@ -58,7 +58,7 @@ export const store = new Vuex.Store<State>({
         ...state.prices,
         [message.isin]: {
           ...message,
-          timestamp: Date.now(),
+          timestamp: new Date().toLocaleTimeString(),
         },
       }
     },

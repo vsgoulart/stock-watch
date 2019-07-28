@@ -3,7 +3,9 @@
     <Form />
     <h3 v-if="hasReconnectFailed">The connection has failed</h3>
     <StockList />
-    <Stock v-for="stock in stocks" :key="stock" v-bind:isin="stock" />
+    <div class="stock-container">
+      <Stock v-for="stock in stocks" :key="stock" v-bind:isin="stock" />
+    </div>
   </div>
 </template>
 
@@ -39,5 +41,23 @@ export default Vue.extend({
   font-family: Arial, Helvetica, sans-serif;
   text-align: center;
   color: #3e3e3e;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
+  & > * {
+    margin-bottom: 10px;
+  }
+}
+
+.stock-container {
+  width: 100vw;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+
+  & > * {
+    margin: 5px;
+  }
 }
 </style>

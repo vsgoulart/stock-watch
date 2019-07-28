@@ -1,16 +1,24 @@
 <template>
-  <form @submit.prevent="handleSubmit" @keydown.enter="handleSubmit">
-    <label for="isin">
-      ISIN
-      <input
-        type="text"
+  <form
+    @submit.prevent="handleSubmit"
+    @keydown.enter="handleSubmit"
+    class="form"
+  >
+    <md-field md-inline>
+      <label>ISIN</label>
+      <md-input
         id="isin"
         name="isin"
         v-model="isin"
         v-bind:disabled="disabled"
-      />
-    </label>
-    <button type="submit" v-bind:disabled="disabled">Add</button>
+      ></md-input>
+    </md-field>
+    <md-button
+      class="md-raised md-primary"
+      type="submit"
+      v-bind:disabled="disabled"
+      >Add</md-button
+    >
   </form>
 </template>
 
@@ -42,3 +50,10 @@ export default Vue.extend({
   },
 })
 </script>
+
+<style lang="scss" scoped>
+.form {
+  display: flex;
+  width: 200px;
+}
+</style>

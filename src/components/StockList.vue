@@ -1,10 +1,12 @@
 <template>
   <div>
-    <span
+    <md-chip
+      class="md-primary stock"
+      md-deletable
       v-for="(stock, index) in stocks"
       :key="index"
       @click="removeStock(stock)"
-      >{{ stock }}</span
+      >{{ stock }}</md-chip
     >
   </div>
 </template>
@@ -28,3 +30,9 @@ export default Vue.extend({
   },
 })
 </script>
+
+<style lang="scss" scoped>
+.stock {
+  margin-bottom: 5px;
+}
+</style>
